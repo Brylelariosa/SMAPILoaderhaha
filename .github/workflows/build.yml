@@ -23,7 +23,8 @@ jobs:
 
       - name: Install custom Mono runtime
         run: |
-          PACK_DIR=$(ls -d ~/.dotnet/packs/Microsoft.NETCore.App.Runtime.Mono.android-arm64/*)
+          PACK_DIR=$(find /usr/share/dotnet/packs/Microsoft.NETCore.App.Runtime.Mono.android-arm64 -maxdepth 1 -mindepth 1 -type d | head -1)
+          echo "Pack dir: $PACK_DIR"
           cp SharedLibs/native/arm64-v8a/libmonosgen-2.0.so \
              "$PACK_DIR/runtimes/android-arm64/native/libmonosgen-2.0.so"
 

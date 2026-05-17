@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net9.0-android</TargetFramework>
 		<OutputType>Exe</OutputType>
@@ -9,7 +9,7 @@
 		<Version></Version>
 
 		<!-- Versions -->
-		<ApplicationDisplayVersion>1.1.6</ApplicationDisplayVersion>
+		<ApplicationDisplayVersion>1.1.5</ApplicationDisplayVersion>
 		<ApplicationVersion>$([System.DateTimeOffset]::Now.ToUnixTimeSeconds())</ApplicationVersion>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
@@ -80,10 +80,7 @@
 			<HintPath>..\..\SMAPI-Android-1.6\src\DependenciesDll\StardewValley.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
-		<Reference Include="StardewValley.GameData">
-			<HintPath>..\..\SMAPI-Android-1.6\src\DependenciesDll\StardewValley.GameData.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
+
 	</ItemGroup>
 	<ItemGroup>
 		<None Update="Resources\Drawable\icon.png">

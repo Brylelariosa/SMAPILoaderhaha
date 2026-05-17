@@ -59,5 +59,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: SMAPILoader-APK
-          path: SMAPIGameLoader/bin/Release/net9.0-android/*.apk
+          path: SMAPIGameLoader/bin/Release/net9.0-android/android-arm64/*.apk
           retention-days: 30

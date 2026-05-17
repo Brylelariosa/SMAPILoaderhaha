@@ -15,12 +15,16 @@ jobs:
 
       - name: Debug - List DLL folder
         run: |
-          echo "=== Repo root ==="
-          ls -la
-          echo "=== SMAPI-Android-1.6 ==="
-          ls -la SMAPI-Android-1.6/ || echo "FOLDER NOT FOUND"
           echo "=== DependenciesDll ==="
           ls -la SMAPI-Android-1.6/src/DependenciesDll/ || echo "FOLDER NOT FOUND"
+          echo "=== csproj HintPaths ==="
+          grep "HintPath" SMAPIGameLoader/SMAPIGameLoader.csproj
+
+      - name: Fix csproj paths (replace backslashes with forward slashes)
+        run: |
+          sed -i 's|\\\\|/|g; s|\\|/|g' SMAPIGameLoader/SMAPIGameLoader.csproj
+          echo "=== Fixed HintPaths ==="
+          grep "HintPath" SMAPIGameLoader/SMAPIGameLoader.csproj
 
       - name: Setup .NET 9
         uses: actions/setup-dotnet@v4

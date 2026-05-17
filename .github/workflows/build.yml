@@ -25,12 +25,6 @@ jobs:
           echo "=== DLLs in SMAPIGameLoader ==="
           ls -la SMAPIGameLoader/*.dll
 
-      - name: Patch AssemblyStore for Android RID
-        run: |
-          sed -i 's|<TargetFramework>net9.0</TargetFramework>|<TargetFramework>net9.0</TargetFramework>\n    <RuntimeIdentifiers>android-arm64</RuntimeIdentifiers>|' AssemblyStore/AssemblyStore.csproj
-          echo "=== Patched AssemblyStore.csproj ==="
-          cat AssemblyStore/AssemblyStore.csproj
-
       - name: Setup .NET 9
         uses: actions/setup-dotnet@v4
         with:
@@ -49,7 +43,7 @@ jobs:
       - name: Restore NuGet packages
         run: |
           dotnet restore SMAPIGameLoader/SMAPIGameLoader.csproj \
-            -p:RuntimeIdentifiers="android-arm64"
+            -p:RuntimeIdentifier="android-arm64"
 
       - name: Build APK
         run: |
@@ -59,7 +53,7 @@ jobs:
             -p:AndroidSdkDirectory=$ANDROID_SDK_ROOT \
             -p:JavaSdkDirectory=$JAVA_HOME_17_X64 \
             -p:AndroidCreatePackagePerAbi=false \
-            -p:RuntimeIdentifiers="android-arm64"
+            -p:RuntimeIdentifier="android-arm64"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

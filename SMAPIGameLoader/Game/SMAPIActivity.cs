@@ -1,4 +1,4 @@
-﻿using Android.App;
+using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
@@ -29,7 +29,7 @@ namespace SMAPIGameLoader;
         | ConfigChanges.KeyboardHidden | ConfigChanges.Orientation
         | ConfigChanges.ScreenLayout | ConfigChanges.ScreenSize
         | ConfigChanges.UiMode))]
-public class SMAPIActivity : AndroidGameActivity
+public class SMAPIActivity : Android.App.Activity
 {
     public static SMAPIActivity Instance { get; private set; }
 

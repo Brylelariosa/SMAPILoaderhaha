@@ -79,7 +79,14 @@ public class SMAPIActivity : Android.App.Activity
     void IntegrateStardewMainActivity()
     {
         Console.WriteLine("try get instance field");
-        var instance_Field = typeof(MainActivity).GetField("instance", BindingFlags.Static | BindingFlags.Public);
+        var mainActivityType = GameAssemblyManager.LoadedStardewAssembly?
+            .GetType("StardewValley.MainActivity");
+        if (mainActivityType == null)
+        {
+            Console.WriteLine("IntegrateStardewMainActivity: MainActivity type not found");
+            return;
+        }
+        var instance_Field = mainActivityType.GetField("instance", BindingFlags.Static | BindingFlags.Public);
         Console.WriteLine("try set field");
         instance_Field.SetValue(null, this);
         Console.WriteLine("done setup MainActivity.instance with: " + instance_Field.GetValue(null));
@@ -121,7 +128,7 @@ public class SMAPIActivity : Android.App.Activity
         Log.It("MainActivity.OnResume");
         base.OnResume();
         if (_game1 != null)
-            _game1.OnAppResume();
+            _game1.GetType().GetMethod("OnAppResume")?.Invoke(_game1, null);
 
         RequestedOrientation = ScreenOrientation.SensorLandscape;
         SetImmersive();
@@ -130,9 +137,10 @@ public class SMAPIActivity : Android.App.Activity
     {
         Log.It("MainActivity.OnPause");
         if (_game1 != null)
-            _game1.OnAppPause();
+            _game1.GetType().GetMethod("OnAppPause")?.Invoke(_game1, null);
 
-        Game1.emergencyBackup();
+        typeof(StardewValley.Game1).GetMethod("emergencyBackup",
+            BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)?.Invoke(null, null);
         base.OnPause();
     }
     public override void OnWindowFocusChanged(bool hasFocus)
@@ -382,9 +390,10 @@ public class SMAPIActivity : Android.App.Activity
             if (displayCutout.SafeInsetLeft > 0 || displayCutout.SafeInsetRight > 0)
             {
                 int num = Math.Max(displayCutout.SafeInsetLeft, displayCutout.SafeInsetRight);
-                Game1.xEdge = Math.Min(90, num);
-                Game1.toolbarPaddingX = num;
-                Log.It("MainActivity.SetPaddingForMenus CUT OUT toolbarPaddingX:" + Game1.toolbarPaddingX + ", xEdge:" + Game1.xEdge);
+                var game1Type = typeof(StardewValley.Game1);
+                game1Type.GetField("xEdge", BindingFlags.Static | BindingFlags.Public)?.SetValue(null, Math.Min(90, num));
+                game1Type.GetField("toolbarPaddingX", BindingFlags.Static | BindingFlags.Public)?.SetValue(null, num);
+                Log.It("MainActivity.SetPaddingForMenus CUT OUT toolbarPaddingX:" + num + ", xEdge:" + Math.Min(90, num));
                 return;
             }
         }
@@ -394,13 +403,15 @@ public class SMAPIActivity : Android.App.Activity
         WindowManager.DefaultDisplay.GetRealMetrics(displayMetrics);
         if (displayMetrics.HeightPixels >= 1920 || displayMetrics.WidthPixels >= 1920)
         {
-            Game1.xEdge = 20;
-            Game1.toolbarPaddingX = 20;
+            var game1Type = typeof(StardewValley.Game1);
+            game1Type.GetField("xEdge", BindingFlags.Static | BindingFlags.Public)?.SetValue(null, 20);
+            game1Type.GetField("toolbarPaddingX", BindingFlags.Static | BindingFlags.Public)?.SetValue(null, 20);
         }
     }
     public static void SetupDisplaySettings()
     {
-        var MobileDisplayType = typeof(MainActivity).Assembly.GetType("StardewValley.Mobile.MobileDisplay");
-        MobileDisplayType.GetMethod("SetupDisplaySettings", BindingFlags.Static | BindingFlags.Public).Invoke(null, null);
+        var stardewAsm = GameAssemblyManager.LoadedStardewAssembly;
+        var MobileDisplayType = stardewAsm?.GetType("StardewValley.Mobile.MobileDisplay");
+        MobileDisplayType?.GetMethod("SetupDisplaySettings", BindingFlags.Static | BindingFlags.Public)?.Invoke(null, null);
     }
 }

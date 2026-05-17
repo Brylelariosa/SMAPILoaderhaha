@@ -1,10 +1,5 @@
-﻿using HarmonyLib;
-using StardewValley;
+using HarmonyLib;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SMAPIGameLoader;
 
@@ -20,11 +15,18 @@ internal class MainActivityPatcher
     internal static void Apply()
     {
         var harmony = new Harmony("SMAPIGameLoader");
-        var PrefixCheckStorageMigration = AccessTools.Method(
+        var prefixMethod = AccessTools.Method(
             typeof(MainActivityPatcher), nameof(MainActivityPatcher.PrefixCheckStorageMigration));
-        var CheckStorageMigration = AccessTools.Method(
-            typeof(MainActivity), nameof(MainActivity.CheckStorageMigration));
-        harmony.Patch(CheckStorageMigration, prefix: PrefixCheckStorageMigration);
+
+        var mainActivityType = GameAssemblyManager.LoadedStardewAssembly?
+            .GetType("StardewValley.MainActivity");
+        if (mainActivityType == null)
+        {
+            Console.WriteLine("MainActivityPatcher: MainActivity type not found, skipping patch");
+            return;
+        }
+        var checkStorageMigration = AccessTools.Method(mainActivityType, "CheckStorageMigration");
+        harmony.Patch(checkStorageMigration, prefix: prefixMethod);
         Console.WriteLine("Done MainActivityPatcher.Apply()");
     }
 }

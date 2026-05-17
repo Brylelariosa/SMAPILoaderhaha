@@ -1,10 +1,5 @@
-﻿using HarmonyLib;
-using StardewValley;
+using HarmonyLib;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SMAPIGameLoader;
 
@@ -18,7 +13,13 @@ internal class Log
     public static void Setup()
     {
         var harmony = new Harmony("SMAPIGameLoader");
-        var DefaultLogger = typeof(MainActivity).Assembly.GetType("StardewValley.Logging.DefaultLogger");
+        var stardewAsm = GameAssemblyManager.LoadedStardewAssembly;
+        var DefaultLogger = stardewAsm?.GetType("StardewValley.Logging.DefaultLogger");
+        if (DefaultLogger == null)
+        {
+            Console.WriteLine("Log.Setup: DefaultLogger type not found, skipping patch");
+            return;
+        }
         var LogImpl = AccessTools.Method(DefaultLogger, "LogImpl");
         harmony.Patch(LogImpl, prefix: AccessTools.Method(typeof(Log), nameof(PrefixLogImpl)));
     }

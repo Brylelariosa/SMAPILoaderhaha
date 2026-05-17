@@ -18,8 +18,8 @@ jobs:
           cp SMAPI-Android-1.6/src/DependenciesDll/MonoGame.Framework.dll SMAPIGameLoader/MonoGame.Framework.dll
           cp SMAPI-Android-1.6/src/DependenciesDll/StardewValley.dll SMAPIGameLoader/StardewValley.dll
           # Patch HintPaths to use local copies
-          sed -i 's|../../SMAPI-Android-1.6/src/DependenciesDll/MonoGame.Framework.dll|MonoGame.Framework.dll|g' SMAPIGameLoader/SMAPIGameLoader.csproj
-          sed -i 's|../../SMAPI-Android-1.6/src/DependenciesDll/StardewValley.dll|StardewValley.dll|g' SMAPIGameLoader/SMAPIGameLoader.csproj
+          sed -i 's|../SMAPI-Android-1.6/src/DependenciesDll/MonoGame.Framework.dll|MonoGame.Framework.dll|g' SMAPIGameLoader/SMAPIGameLoader.csproj
+          sed -i 's|../SMAPI-Android-1.6/src/DependenciesDll/StardewValley.dll|StardewValley.dll|g' SMAPIGameLoader/SMAPIGameLoader.csproj
           echo "=== Patched HintPaths ==="
           grep "HintPath" SMAPIGameLoader/SMAPIGameLoader.csproj
           echo "=== DLLs in SMAPIGameLoader ==="

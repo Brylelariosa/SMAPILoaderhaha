@@ -17,10 +17,23 @@ internal static class StardewApkTool
     static bool IsGameFromGalaxyStore = false;
     static PackageInfo _currentPackageInfo;
 
+    // Optional: set this to a custom APK path to bypass package detection entirely.
+    // e.g. "/sdcard/stardew.apk" or any path the app has read access to.
+    public static string ManualApkPath { get; set; } = null;
+
     //init at first SDK
     static StardewApkTool()
     {
         Console.WriteLine("Initialize Stardew Apk Tool");
+
+        // If a manual path is set, skip package manager detection completely
+        if (!string.IsNullOrEmpty(ManualApkPath))
+        {
+            Console.WriteLine("Game APK set manually: " + ManualApkPath);
+            _manualApkPath = ManualApkPath;
+            return;
+        }
+
         var playStore = ApkTool.GetPackageInfo(GamePlayStorePackageName);
         var samsung = ApkTool.GetPackageInfo(GameGalaxyStorePackageName);
 
@@ -45,37 +58,39 @@ internal static class StardewApkTool
         }
     }
 
+    static string _manualApkPath = null;
+
     public static PackageInfo CurrentPackageInfo => _currentPackageInfo;
 
     public static bool IsInstalled
     {
         get
         {
-            // Accept any installation as long as the package is found
+            if (_manualApkPath != null) return true;
             return CurrentPackageInfo != null;
         }
     }
 
     public static Android.Content.Context GetContext => Application.Context;
-    public static string? BaseApkPath => CurrentPackageInfo?.ApplicationInfo?.PublicSourceDir;
+    public static string? BaseApkPath => _manualApkPath ?? CurrentPackageInfo?.ApplicationInfo?.PublicSourceDir;
     public static string? Arm64ApkPath
     {
         get
         {
             try
             {
+                if (_manualApkPath != null) return _manualApkPath;
+
                 if (CurrentPackageInfo == null)
                     return null;
 
                 if (IsGameFromPlayStore)
                 {
-                    // Try split APK first (standard Play Store install)
                     var splitPath = CurrentPackageInfo.ApplicationInfo.SplitSourceDirs?.FirstOrDefault(path => path.Contains("split_config.arm64"));
                     if (splitPath != null)
                         return splitPath;
                 }
 
-                // Samsung or sideloaded: assemblies are in the base APK
                 return BaseApkPath;
             }
             catch (Exception ex)
@@ -92,10 +107,11 @@ internal static class StardewApkTool
         {
             try
             {
+                if (_manualApkPath != null) return _manualApkPath;
+
                 if (CurrentPackageInfo == null)
                     return null;
 
-                //play store split install
                 if (IsGameFromPlayStore)
                 {
                     var splitPath = CurrentPackageInfo.ApplicationInfo.SplitSourceDirs?.FirstOrDefault(path => path.Contains("split_content"));
@@ -103,7 +119,6 @@ internal static class StardewApkTool
                         return splitPath;
                 }
 
-                //samsung or sideloaded: content is in the base APK
                 return BaseApkPath;
             }
             catch (Exception ex)

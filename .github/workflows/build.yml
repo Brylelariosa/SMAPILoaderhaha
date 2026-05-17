@@ -25,6 +25,12 @@ jobs:
           echo "=== DLLs in SMAPIGameLoader ==="
           ls -la SMAPIGameLoader/*.dll
 
+      - name: Patch AssemblyStore for Android RID
+        run: |
+          sed -i 's|<TargetFramework>net9.0</TargetFramework>|<TargetFramework>net9.0</TargetFramework>\n    <RuntimeIdentifiers>android-arm64</RuntimeIdentifiers>|' AssemblyStore/AssemblyStore.csproj
+          echo "=== Patched AssemblyStore.csproj ==="
+          cat AssemblyStore/AssemblyStore.csproj
+
       - name: Setup .NET 9
         uses: actions/setup-dotnet@v4
         with:

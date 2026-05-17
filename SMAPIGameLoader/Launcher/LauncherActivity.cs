@@ -69,20 +69,7 @@ public class LauncherActivity : AppCompatActivity
         {
             if (StardewApkTool.IsInstalled == false)
             {
-                var currentPackage = StardewApkTool.CurrentPackageInfo;
-                if (currentPackage != null)
-                    switch (currentPackage.PackageName)
-                    {
-                        case StardewApkTool.GamePlayStorePackageName:
-                            ToastNotifyTool.Notify("Please Download Game From Play Store");
-                            break;
-                        case StardewApkTool.GameGalaxyStorePackageName:
-                            ToastNotifyTool.Notify("Please Download Game From Galaxy Store");
-                            break;
-                    }
-                else
-                    ToastNotifyTool.Notify("Please Download Game From Play Store Or Galaxy Store");
-
+                ToastNotifyTool.Notify("Stardew Valley not found. Please install the game.");
                 return false;
             }
         }

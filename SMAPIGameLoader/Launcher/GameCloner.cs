@@ -1,4 +1,4 @@
-﻿using Android.App;
+using Android.App;
 using Android.OS;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -97,19 +97,24 @@ internal static class GameCloner
         if (isNeedCloenGame)
         {
             TaskTool.NewLine("Try rewriter StardewValley.dll");
-            using (var stardewAssemblyStream = File.Open(GameAssemblyManager.StardewValleyFilePath,
-                FileMode.Open, FileAccess.ReadWrite))
-            {
+            var stardewPath = GameAssemblyManager.StardewValleyFilePath;
+            var tempPath = stardewPath + ".tmp";
 
+            using (var stardewAssemblyStream = File.Open(stardewPath, FileMode.Open, FileAccess.Read))
+            {
                 TaskTool.NewLine("Starting StardewValley Rewriter...");
                 var stardewAssemblyDef = StardewGameRewriter.ReadAssembly(stardewAssemblyStream);
                 StardewGameRewriter.Rewrite(stardewAssemblyDef);
                 StardewAudioRewriter.Rewrite(stardewAssemblyDef);
 
                 TaskTool.NewLine("Try save StardewValley rewriter to file..");
-                stardewAssemblyDef.Write();
+                stardewAssemblyDef.Write(tempPath);
                 TaskTool.NewLine("Successfully Rewrite StardewValley.dll");
             }
+
+            // Replace original with patched version
+            File.Move(tempPath, stardewPath, overwrite: true);
+        }
 
             //Don't load StardewValley assembly here
             //you should load at SMAPIActivity

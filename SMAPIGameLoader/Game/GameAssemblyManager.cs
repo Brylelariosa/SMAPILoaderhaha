@@ -1,4 +1,4 @@
-﻿using Android.App;
+using Android.App;
 using MonoGame.Framework.Utilities;
 using SMAPIGameLoader.Game;
 using SMAPIGameLoader.Launcher;
@@ -52,9 +52,14 @@ internal class GameAssemblyManager
             Console.WriteLine("done clone SMAPI Game Loader Assemblies");
         }
     }
+    public static Assembly LoadedStardewAssembly { get; private set; }
+
     public static Assembly LoadAssembly(string dllFileName)
     {
-        return Assembly.LoadFrom(Path.Combine(AssembliesDirPath, dllFileName));
+        var asm = Assembly.LoadFrom(Path.Combine(AssembliesDirPath, dllFileName));
+        if (dllFileName == StardewDllName)
+            LoadedStardewAssembly = asm;
+        return asm;
     }
 
     static string LibDirPath => Path.Combine(FileTool.ExternalFilesDir, "lib");

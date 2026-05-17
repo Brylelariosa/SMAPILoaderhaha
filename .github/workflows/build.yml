@@ -41,7 +41,9 @@ jobs:
              "$PACK_DIR/runtimes/android-arm64/native/libmonosgen-2.0.so"
 
       - name: Restore NuGet packages
-        run: dotnet restore SMAPIGameLoader/SMAPIGameLoader.csproj
+  run: |
+    dotnet restore SMAPIGameLoader/SMAPIGameLoader.csproj \
+      -p:RuntimeIdentifiers="android-arm64"
 
       - name: Build APK
         run: |

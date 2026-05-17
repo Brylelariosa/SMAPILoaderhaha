@@ -1,4 +1,4 @@
-﻿using Android.App;
+using Android.App;
 using Android.Content.PM;
 using Android.OS;
 using System;
@@ -37,6 +37,12 @@ internal static class StardewApkTool
             IsGameFromPlayStore = true;
             Console.WriteLine("Game Install From Play Store");
         }
+        else
+        {
+            // Fallback: accept any sideloaded/non-store installation with the base package name
+            _currentPackageInfo = playStore ?? samsung;
+            Console.WriteLine("Game Install From Unknown Source (sideloaded)");
+        }
     }
 
     public static PackageInfo CurrentPackageInfo => _currentPackageInfo;
@@ -45,19 +51,8 @@ internal static class StardewApkTool
     {
         get
         {
-            if (CurrentPackageInfo == null)
-                return false;
-
-            //play store
-            if (IsGameFromPlayStore)
-            {
-                var version = CurrentPackageInfo.VersionName;
-                var splitApks = CurrentPackageInfo.ApplicationInfo?.SplitSourceDirs;
-                return splitApks?.Count == 2;
-            }
-
-            //samsung
-            return true;
+            // Accept any installation as long as the package is found
+            return CurrentPackageInfo != null;
         }
     }
 
@@ -73,9 +68,14 @@ internal static class StardewApkTool
                     return null;
 
                 if (IsGameFromPlayStore)
-                    return CurrentPackageInfo.ApplicationInfo.SplitSourceDirs?.FirstOrDefault(path => path.Contains("split_config.arm64"));
+                {
+                    // Try split APK first (standard Play Store install)
+                    var splitPath = CurrentPackageInfo.ApplicationInfo.SplitSourceDirs?.FirstOrDefault(path => path.Contains("split_config.arm64"));
+                    if (splitPath != null)
+                        return splitPath;
+                }
 
-                // Samsung: assemblies are in the base APK
+                // Samsung or sideloaded: assemblies are in the base APK
                 return BaseApkPath;
             }
             catch (Exception ex)
@@ -95,11 +95,15 @@ internal static class StardewApkTool
                 if (CurrentPackageInfo == null)
                     return null;
 
-                //play store
+                //play store split install
                 if (IsGameFromPlayStore)
-                    return CurrentPackageInfo.ApplicationInfo.SplitSourceDirs?.First(path => path.Contains("split_content"));
+                {
+                    var splitPath = CurrentPackageInfo.ApplicationInfo.SplitSourceDirs?.FirstOrDefault(path => path.Contains("split_content"));
+                    if (splitPath != null)
+                        return splitPath;
+                }
 
-                //samsung
+                //samsung or sideloaded: content is in the base APK
                 return BaseApkPath;
             }
             catch (Exception ex)
@@ -124,7 +128,8 @@ internal static class StardewApkTool
                 case GameGalaxyStorePackageName:
                     return new(1, 6, 14, 8);
                 default:
-                    return null;
+                    // Sideloaded: use the Play Store minimum as a baseline
+                    return new(1, 6, 15, 0);
             }
         }
     }

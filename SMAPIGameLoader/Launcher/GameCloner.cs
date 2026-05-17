@@ -116,11 +116,6 @@ internal static class GameCloner
             File.Move(tempPath, stardewPath, overwrite: true);
         }
 
-            //Don't load StardewValley assembly here
-            //you should load at SMAPIActivity
-            //Assembly.LoadFrom(stardewDllFilePath);
-        }
-
         //Finally
         if (isNeedCloenGame)
         {
